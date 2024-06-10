@@ -1,0 +1,10 @@
+{
+    "Edge":{
+        "wiki_name": "Edge",
+        "repo_url": "https://github.com/MicrosoftDocs/Edge-Enterprise",
+        "git_url": "https://github.com/MicrosoftDocs/Edge-Enterprise.git",
+        "md_path": "./edgeenterprise",
+        "url": "https://learn.microsoft.com/en-us/deployedge"
+    },
+    "output_folder": "./results"
+}
