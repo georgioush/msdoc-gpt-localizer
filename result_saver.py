@@ -13,6 +13,6 @@ class ResultSaver:
         print(f"Files saved to {self.dest_folder}")
 
 if __name__ == "__main__":
-    files = ['./translated.md', './image.png']
-    saver = ResultSaver('./results')
+    files = ['../translated.md', '../image.png']
+    saver = ResultSaver('../results')
     saver.save_files(files)

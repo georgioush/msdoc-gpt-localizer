@@ -22,7 +22,7 @@ class MarkdownProcessor:
         return soup
 
 if __name__ == "__main__":
-    processor = MarkdownProcessor('./repos')
+    processor = MarkdownProcessor('../repos')
     md_files = processor.get_markdown_files()
     for md_file in md_files:
         soup = processor.parse_markdown(md_file)

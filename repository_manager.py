@@ -1,5 +1,6 @@
 import json
-import subprocess
+import git
+import os
 
 class RepositoryManager:
     def __init__(self, config_path):
@@ -12,12 +13,16 @@ class RepositoryManager:
         return config['repositories']
     
     def clone_repositories(self):
-        for repo in self.repositories:
-            repo_url = repo['url']
-            repo_name = repo_url.split('/')[-1].replace('.git', '')
-            subprocess.run(['git', 'clone', '--depth=1', repo_url, f'./repos/{repo_name}'])
-            print(f'Repository {repo_name} cloned.')
-    
+        for name, repo in self.repositories.items():
+            repo_url = repo['git_url']
+            dest_path = os.path.join('.', 'repos', name)
+            if not os.path.exists(dest_path):
+                # --depth 1 オプションを使用して直近のコミットだけを取得
+                git.Repo.clone_from(repo_url, dest_path, depth=1)
+                print(f'Repository {name} cloned.')
+            else:
+                print(f'Repository {name} already exists at {dest_path}.')
+
 if __name__ == "__main__":
-    manager = RepositoryManager('./config.json')
+    manager = RepositoryManager('repository_config.json')
     manager.clone_repositories()
