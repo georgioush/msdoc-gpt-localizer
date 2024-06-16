@@ -1,5 +1,4 @@
 import os
-from markdown_processor import MarkdownProcessor
 from repository_manager import RepositoryManager
 from result_saver import ResultSaver
 from translator import Translator
