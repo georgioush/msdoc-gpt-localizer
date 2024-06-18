@@ -1,10 +1,11 @@
 {
-    "repositories": {
-        "Edge": {
-            "wiki_name": "Edge",
+    "repos": [
+        {
+            "name": "Edge",
             "repo_url": "https://github.com/MicrosoftDocs/Edge-Enterprise",
-            "url": "https://learn.microsoft.com/en-us/deployedge/"
+            "url": "https://learn.microsoft.com/en-us/deployedge/",
+            "path": "repos/Edge"
         }
-    },
+    ],
     "output_folder": "outrepos"
 }
