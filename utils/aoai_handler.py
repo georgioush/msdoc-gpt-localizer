@@ -13,12 +13,13 @@ class AOAIHandler:
             azure_endpoint=self.azure_endpoint,
             api_version=self.api_version
         )
-        
-    def translate_text(self, text):
+
+    def translate_text(self, text, target_language):
+        # Implementation of the translation using Azure OpenAI service
         response = self.client.chat.completions.create(
             model=self.deployment_name,
             messages=[
-                {"role": "system", "content": "Translate the following text:"},
+                {"role": "system", "content": f"Translate the following text to {target_language}:"},
                 {"role": "user", "content": text},
             ],
         )
@@ -27,17 +28,3 @@ class AOAIHandler:
             return response.choices[0].message.content.strip()
         else:
             raise ValueError("No translation content received")
-
-    def summarize_text(self, text):
-        response = self.client.chat.completions.create(
-            model=self.deployment_name,
-            messages=[
-                {"role": "system", "content": "Summarize the following text:"},
-                {"role": "user", "content": text},
-            ],
-        )
-        
-        if response.choices[0].message.content is not None:
-            return response.choices[0].message.content.strip()
-        else:
-            raise ValueError("No summary content received")

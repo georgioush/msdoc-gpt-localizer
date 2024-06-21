@@ -2,7 +2,7 @@ import os
 from openpublishing_config_handler import OpenPublishingConfigHandler
 from repository_manager import RepositoryManager
 from toc_handler import TOCHandler
-from markdown import Markdown
+from .markdown import Markdown
 from markdown_translator import translate
 from markdown_summarizer import summarize
 
