@@ -1,17 +1,10 @@
 import os
-from utils.aoai_handler import AOAIHandler  # 'dev'を削除してパスを修正
-from markdown_translator import MarkdownTranslator  # 'dev'を削除してパスを修正
-from markdown_summarizer import MarkdownSummarizer  # 'dev'を削除してパスを修正
-from toc_handler import TOCHandler
 from openpublishing_config_handler import OpenPublishingConfigHandler
 from repository_manager import RepositoryManager
-
-class Markdown:
-    def __init__(self, content):
-        self.content = content
-        self.translated_content = None
-        self.summary_content = None
-        self.tokenized_sections = []  # トークナイズされた内容を保持
+from toc_handler import TOCHandler
+from markdown import Markdown
+from markdown_translator import translate
+from markdown_summarizer import summarize
 
 class MarkdownHandler:
     def __init__(self, markdown_path):
@@ -22,17 +15,13 @@ class MarkdownHandler:
         with open(self.markdown_path, 'r', encoding='utf-8') as file:
             return Markdown(file.read())
 
-    def save_markdown(self, markdown, output_path):
-        with open(output_path, 'w', encoding='utf-8') as file:
-            file.write(markdown.content)
-
     def translate_markdown(self):
-        translator = MarkdownTranslator(self.markdown)
-        translator.translate()
+        translate(self.markdown)
+        return self
 
     def summarize_markdown(self):
-        summarizer = MarkdownSummarizer(self.markdown)
-        summarizer.summarize()
+        summarize(self.markdown)
+        return self
 
 if __name__ == "__main__":
     # Initialize the RepositoryManager to load the repository configuration
@@ -52,12 +41,14 @@ if __name__ == "__main__":
 
     handler = MarkdownHandler(first_md_file_path)
 
-    # マークダウンファイルの翻訳と保存
-    handler.translate_markdown()
-    translated_output_path = first_md_file_path.replace('.md', '_translated.md')
-    handler.save_markdown(Markdown(handler.markdown.translated_content), translated_output_path)
+    print("Original Content:")
+    print(handler.markdown.content)
 
-    # マークダウンファイルのサマリーと保存
-    handler.summarize_markdown()
-    summary_output_path = first_md_file_path.replace('.md', '_summary.md')
-    handler.save_markdown(Markdown(handler.markdown.summary_content), summary_output_path)
+    handler.markdown.translate_markdown()
+    print("Translated Content:")
+    print(handler.markdown.translated_content)
+
+    handler.markdown.summriize_markdown()
+    print("Summarized Content:")
+    print(handler.markdown.summarized_content)
+    
