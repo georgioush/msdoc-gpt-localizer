@@ -81,10 +81,10 @@ def translate(markdown: MSMarkdown):
         response = aoai_handler.translate_text(section, "ja")
 
         print("Translated Section:", response)
-        markdown.translated_content += response
+        markdown.translated_content += response + "\n"
 
 if __name__ == "__main__":
-    with open("repos/Edge/edgeenterprise/microsoft-edge-policies.md", 'r', encoding='utf-8') as file:
+    with open("repos/Edge/edgeenterprise/edge-ie-mode-cloud-site-list-mgmt.md", 'r', encoding='utf-8') as file:
         content = file.read()
 
     token_counter = TokenCounter()
@@ -100,5 +100,9 @@ if __name__ == "__main__":
     for section in markdown_instance.tokenized_content.tokenized_sections:
         print("Tokens:", token_counter.count_tokens(section))
 
+    print("Translation Started")
     translate(markdown_instance)
-    print(markdown_instance.translated_content)
+
+    with open("outrepos/Edge/edgeenterprise/edge-ie-mode-cloud-site-list-mgmt.md", 'w', encoding='utf-8') as file:
+        file.write(markdown_instance.translated_content)
+        print("Translation Finished")
