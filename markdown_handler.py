@@ -2,7 +2,7 @@ import os
 from openpublishing_config_handler import OpenPublishingConfigHandler
 from repository_manager import RepositoryManager
 from toc_handler import TOCHandler
-from .markdown import Markdown
+from msmarkdown import MSMarkdown
 from markdown_translator import translate
 from markdown_summarizer import summarize
 
@@ -13,15 +13,13 @@ class MarkdownHandler:
         
     def load_markdown(self):
         with open(self.markdown_path, 'r', encoding='utf-8') as file:
-            return Markdown(file.read())
+            return MSMarkdown(file.read())
 
     def translate_markdown(self):
         translate(self.markdown)
-        return self
 
     def summarize_markdown(self):
         summarize(self.markdown)
-        return self
 
 if __name__ == "__main__":
     # Initialize the RepositoryManager to load the repository configuration
@@ -48,7 +46,6 @@ if __name__ == "__main__":
     print("Translated Content:")
     print(handler.markdown.translated_content)
 
-    handler.markdown.summriize_markdown()
+    handler.markdown.summarize_markdown()
     print("Summarized Content:")
     print(handler.markdown.summarized_content)
-    

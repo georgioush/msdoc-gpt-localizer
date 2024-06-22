@@ -13,6 +13,12 @@ class TokenCounter:
     def count_tokens(self, text):
         return len(self.encoding.encode(text))
 
+    def human_readable_size(self, byte_size):
+        for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+            if byte_size < 1024:
+                return f"{byte_size:.2f} {unit}"
+            byte_size /= 1024
+
 if __name__ == "__main__":
     # Example usage
     text = "Hello, this is a test."

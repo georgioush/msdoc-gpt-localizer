@@ -1,77 +1,104 @@
-import os
+import re
 from utils.aoai_handler import AOAIHandler
 from utils.token_counter import TokenCounter
-from .markdown import Markdown
+from msmarkdown import MSMarkdown
 
-def tokenize_markdown(markdown: Markdown, max_tokens: int):
-    # Here we will implement the logic to split markdown.content into sections,
-    # each having a maximum of 'max_tokens' tokens. For simplicity, let's assume
-    # paragraphs are separated by double newline characters.
+# Utility functions for different header levels
+HEADER_PATTERNS = [
+    (2, r'(?:^|\n)\s*(## .+?)(?=(?:\n\s*## |\Z))'),
+    (3, r'(?:^|\n)\s*(### .+?)(?=(?:\n\s*### |\Z))'),
+    (4, r'(?:^|\n)\s*(#### .+?)(?=(?:\n\s*#### |\Z))'),
+    (5, r'(?:^|\n)\s*(##### .+?)(?=(?:\n\s*##### |\Z))'),
+]
+
+def split_large_section(section, token_counter, max_tokens):
     
-    # Tokenizer initialization
-    token_counter = TokenCounter()
-    
-    paragraphs = markdown.content.split('\n\n')
+    # section は markdown の一部なので、まずは行数を数える
+    lines = section.split('\n')
+    line_count = len(lines)
+
+    # section のトークン数を max_tokens で割った商を求める なお、端数を切り上げた自然数にする
+    section_num = -(-token_counter.count_tokens(section) // max_tokens)
+
+    # line_count を section_num で割り、分割セクションの行数を決定する 念の為行数を 1 つ減らす
+    split_line_count = line_count // section_num - 1 
+
+    # 最初の行数から split_line_count ずつ取り出して、分割セクションを作成する
     tokenized_sections = []
-    current_section = ""
-    current_token_count = 0
-    
-    for paragraph in paragraphs:
-        paragraph_token_count = token_counter.count_tokens(paragraph)
-        
-        if current_token_count + paragraph_token_count > max_tokens:
-            tokenized_sections.append(current_section.strip())
-            current_section = paragraph
-            current_token_count = paragraph_token_count
-        else:
-            current_section += '\n\n' + paragraph
-            current_token_count += paragraph_token_count
-    
-    if current_section:
-        tokenized_sections.append(current_section.strip())
-    
-    # Returning meta_info which might be located in markdown.meta_info
-    # For this example, we'll keep it simple and return None
-    meta_info = None
-    
-    return meta_info, tokenized_sections
+    for i in range(section_num):
+        start = i * split_line_count
+        end = (i + 1) * split_line_count
+        tokenized_sections.append("\n".join(lines[start:end]))
 
-def translate(markdown: Markdown):
-    # Initialize the Azure OpenAI handler
-    aoai_handler = AOAIHandler()
-    # Initialize the TokenCounter
+    return tokenized_sections
+
+def tokenize_section(section, token_counter, max_tokens, level=0):
+
+    if token_counter.count_tokens(section) <= max_tokens:
+        return [section]
+
+    if (level + 2) > len(HEADER_PATTERNS) + 1:
+        # If we have reached the maximum header depth, split the section
+        return split_large_section(section, token_counter, max_tokens)
+
+    tokenized_sections = []
+    pattern = HEADER_PATTERNS[level][1]
+    sub_sections = re.split(pattern, section, flags=re.DOTALL)
+
+    for sub_section in sub_sections:
+        if sub_section.strip():
+            print("Header Level:", f"{level + 2}", "Section Size:", f"{token_counter.count_tokens(sub_section)}")
+            tokenized_sections.extend(tokenize_section(sub_section, token_counter, max_tokens, level + 1))
+
+    return tokenized_sections
+
+def tokenize_markdown(markdown: MSMarkdown, max_tokens: int):
     token_counter = TokenCounter()
-    
-    # Define a maximum token limit (this would be based on Azure OpenAI's max tokens per request)
-    max_tokens = 4096
 
-    # Tokenize the markdown content
-    meta_info, tokenized_sections = tokenize_markdown(markdown, max_tokens)
+    pattern = r'(?:^|\n)\s*(# .+?)(?=(?:\n\s*# |\Z))'
+    sections = re.split(pattern, markdown.content, flags=re.DOTALL)
     
-    translated_sections = []
+    if sections[0].startswith('---'):
+        markdown.tokenized_content.meta_info = sections.pop(0)
+    else:
+        raise ValueError("No meta info found in markdown file.")
     
-    for section in tokenized_sections:
-        translated_text = aoai_handler.translate_text(section, target_language="ja")  # Example: translating to Japanese
-        translated_sections.append(translated_text)
-    
-    # Combine the translated sections into the full translated content
-    markdown.translated_content = "\n\n".join(translated_sections)
-    markdown.tokenized_content.meta_info = meta_info
-    markdown.tokenized_content.tokenized_sections = tokenized_sections
-    
+    for section in sections:
+        if section.strip():
+            print("Section Size:", f"{token_counter.count_tokens(section)}")
+
+    for section in sections:
+        if section.strip():
+            markdown.tokenized_content.tokenized_sections.extend(tokenize_section(section, token_counter, max_tokens))
+
     return markdown
 
-# Example usage:
-if __name__ == "__main__":
+def translate(markdown: MSMarkdown):
+    aoai_handler = AOAIHandler()
+    if markdown.translated_content is None:
+        markdown.translated_content = ""
+    for section in markdown.tokenized_content.tokenized_sections:
+        response = aoai_handler.translate_text(section, "ja")
 
-    # open a file in "repos/Edge/edgeenterprise/configure-edge-with-intune.md"
-    with open("repos/Edge/edgeenterprise/configure-edge-with-intune.md", 'r', encoding='utf-8') as file:
+        print("Translated Section:", response)
+        markdown.translated_content += response
+
+if __name__ == "__main__":
+    with open("repos/Edge/edgeenterprise/microsoft-edge-policies.md", 'r', encoding='utf-8') as file:
         content = file.read()
 
-    markdown_instance = Markdown()
-    markdown_instance.content = content
+    token_counter = TokenCounter()
+    markdown_instance = MSMarkdown(content)
+    tokenize_markdown(markdown_instance, 2048)
 
-    translated_markdown_instance = translate(markdown_instance)
+    print("Meta Info:")
+    print(markdown_instance.tokenized_content.meta_info)
     
-    print("Translated Content:")
-    print(translated_markdown_instance.translated_content)
+    print("Tokenized Sections:")
+    print("Section Num:", len(markdown_instance.tokenized_content.tokenized_sections))
+
+    for section in markdown_instance.tokenized_content.tokenized_sections:
+        print("Tokens:", token_counter.count_tokens(section))
+
+    translate(markdown_instance)
+    print(markdown_instance.translated_content)

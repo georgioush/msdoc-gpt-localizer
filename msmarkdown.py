@@ -3,9 +3,9 @@ class TokenizedMarkdown:
         self.meta_info = None
         self.tokenized_sections = []
 
-class Markdown:
+class MSMarkdown:
     def __init__(self, content):
         self.content = content
-        self.translated_content = None
-        self.summarized_content = None
+        self.translated_content = ""
+        self.summarized_content = ""
         self.tokenized_content = TokenizedMarkdown()

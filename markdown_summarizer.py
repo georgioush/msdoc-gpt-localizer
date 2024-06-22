@@ -1,12 +1,12 @@
 import os
 from utils.aoai_handler import AOAIHandler
 from utils.token_counter import TokenCounter
-from .markdown import Markdown
+from msmarkdown import MSMarkdown
 
-def msdoc_tokenizer(markdowm: Markdown):
+def msdoc_tokenizer(markdowm: MSMarkdown):
     pass
 
-def summrize(markdown: Markdown):
+def summarize(markdown: MSMarkdown):
 
     # Initialize the Azure OpenAI handler
     aoai_handler = AOAIHandler()
