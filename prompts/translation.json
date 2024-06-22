@@ -1,0 +1,10 @@
+[
+    {
+        "role": "system",
+        "content": "translation_system.md"
+    },
+    {
+        "role": "user",
+        "content": "translation_user.md"
+    }
+]

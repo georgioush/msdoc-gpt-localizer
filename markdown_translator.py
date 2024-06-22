@@ -75,10 +75,10 @@ def tokenize_markdown(markdown: MSMarkdown, max_tokens: int):
 
 def translate(markdown: MSMarkdown):
     aoai_handler = AOAIHandler()
-    if markdown.translated_content is None:
-        markdown.translated_content = ""
+
     for section in markdown.tokenized_content.tokenized_sections:
-        response = aoai_handler.translate_text(section, "ja")
+        
+        response = aoai_handler.translate_text(section, "japanese")
 
         print("Translated Section:", response)
         markdown.translated_content += response + "\n"

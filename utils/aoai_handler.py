@@ -14,6 +14,17 @@ class AOAIHandler:
             api_version=self.api_version
         )
 
+    def execute(self, messages):
+        response = self.client.chat.completions.create(
+            model=self.deployment_name,
+            messages=messages
+        )
+        
+        if response.choices[0].message.content is not None:
+            return response.choices[0].message.content
+        else:
+            raise ValueError("No response content received")
+
     def translate_text(self, text, target_language):
         # Implementation of the translation using Azure OpenAI service
         response = self.client.chat.completions.create(
@@ -25,6 +36,6 @@ class AOAIHandler:
         )
         
         if response.choices[0].message.content is not None:
-            return response.choices[0].message.content.strip()
+            return response.choices[0].message.content
         else:
             raise ValueError("No translation content received")
