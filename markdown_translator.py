@@ -1,4 +1,5 @@
 import re
+import json
 from utils.aoai_handler import AOAIHandler
 from utils.token_counter import TokenCounter
 from msmarkdown import MSMarkdown
@@ -73,13 +74,40 @@ def tokenize_markdown(markdown: MSMarkdown, max_tokens: int):
 
     return markdown
 
+
 def translate(markdown: MSMarkdown):
+    # Initialize the Azure OpenAI handler
     aoai_handler = AOAIHandler()
 
-    for section in markdown.tokenized_content.tokenized_sections:
-        
-        response = aoai_handler.translate_text(section, "japanese")
+    # Load the prompt settings from the translation.json file
+    with open("prompts/translation.json", 'r', encoding='utf-8') as prompt_setting_file:
+        prompt_settings = json.load(prompt_setting_file)
 
+    # Read and store the system and user prompts from their respective files
+    system_prompt_path = prompt_settings["system"]
+    user_prompt_path = prompt_settings["user"]
+
+    with open(system_prompt_path, 'r', encoding='utf-8') as system_prompt_file:
+        system_prompt = system_prompt_file.read()
+    
+    with open(user_prompt_path, 'r', encoding='utf-8') as user_prompt_file:
+        user_prompt_template = user_prompt_file.read()
+
+    # Translate each section of the tokenized content
+    for section in markdown.tokenized_content.tokenized_sections:
+        # Merge user prompt template with the current markdown section
+        user_prompt = user_prompt_template + section
+        
+        # Create the prompt configuration
+        prompt_config = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+
+        # Execute the translation with Azure OpenAI
+        response = aoai_handler.execute(prompt_config)
+        
+        # Append the translated section to the markdown's translated content
         print("Translated Section:", response)
         markdown.translated_content += response + "\n"
 

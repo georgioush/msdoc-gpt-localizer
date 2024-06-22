@@ -1,10 +1,4 @@
-[
-    {
-        "role": "system",
-        "content": "translation_system.md"
-    },
-    {
-        "role": "user",
-        "content": "translation_user.md"
-    }
-]
+{
+    "system": "prompts/translation_system.md",
+    "user": "prompts/translation_user.md"    
+}
