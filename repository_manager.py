@@ -3,10 +3,10 @@ import json
 import subprocess
 
 class RepositoryManager:
-    def __init__(self, config_path):
+    def __init__(self, config_path="repository_config.json"):
         self.config_path = config_path
         self.config_data = self.load_config()
-        self.repo_paths = self.get_repo_path()
+        self.repo_paths = self.get_repo_paths()
 
     def load_config(self):
         if os.path.exists(self.config_path):
@@ -38,15 +38,15 @@ class RepositoryManager:
         except subprocess.CalledProcessError as e:
             print(f"Failed to clone {repo_url}: {e}")
 
-    def get_repo_path(self):
+    def get_repo_paths(self):
         repos = self.config_data.get("repos", [])
         paths = [repo["path"] for repo in repos]
         return paths
 
 if __name__ == "__main__":
-    manager = RepositoryManager("repository_config.json")
+    manager = RepositoryManager()
     manager.clone_repositories()
 
     # Example usage of get_repo_path
-    repo_paths = manager.get_repo_path()
+    repo_paths = manager.get_repo_paths()
     print("Repo paths:", repo_paths)
