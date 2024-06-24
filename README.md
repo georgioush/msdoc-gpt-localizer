@@ -4,28 +4,19 @@
 
 ## ディレクトリ構成
 
-- `dev/markdown_processor.py`: Markdown ファイルの加工を行います。
-- `dev/repository_config.json`: リポジトリ設定を記述した JSON ファイルです。
-- `dev/repository_manager.py`: プロジェクトのリポジトリ管理機能を提供します。
-- `dev/result_saver.py`: 処理結果を保存する機能を持ちます。
-- `dev/translator.py`: テキストの翻訳を行います。
+- `main.py`: メインスクリプトファイル。
+- `markdown_handler.py`: Markdownファイルの処理スクリプト。
+- `markdown_summarizer.py`: Markdownファイルのサマリーを生成するスクリプト。
+- `markdown_translator.py`: Markdownファイルの翻訳スクリプト。
+- `msmarkdown.py`: Markdown操作のためのスクリプト。
+- `repository_config.json`: リポジトリの設定ファイル。
+- `repository_manager.py`: リポジトリを管理するスクリプト。
+- `prompts/translation.json`: 翻訳プロンプト用のJSONファイル。
+- `prompts/translation_system.md`: システム翻訳用のプロンプト。
+- `prompts/translation_user.md`: ユーザー翻訳用のプロンプト。
+- `utils/aoai_handler.py`: AOAI関連の処理を行うヘルパースクリプト。
+- `utils/token_counter.py`: トークンカウンター。
 
-## 使用方法
+## アーキテクチャ図
 
-### 1. Markdown Processor
-
-- `markdown_processor.py` を使用することで、リポジトリ内の Markdown ファイルを解析できます。
-
-### 2. Repository Manager
-
-- `repository_config.json` に記述されたリポジトリ設定に基づいて、リポジトリをクローンします。
-
-### 3. Result Saver
-
-- `result_saver.py` を使用することで、処理結果を指定したフォルダに保存できます。
-
-### 4. Translator
-
-- `translator.py` を使用して、テキストを翻訳します。
-
-以上のスクリプトを組み合わせることで、プロジェクトの開発を迅速且つ効率的に進めることが可能です。
+以下は、この `dev` ディレクトリに存在する主要なファイルとその関係を示したアーキテクチャ図です。
