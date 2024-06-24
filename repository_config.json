@@ -5,6 +5,12 @@
             "repo_url": "https://github.com/MicrosoftDocs/Edge-Enterprise",
             "url": "https://learn.microsoft.com/en-us/deployedge/",
             "path": "repos/Edge"
+        },
+        {
+            "name": "EdgeDeveloper",
+            "repo_url": "https://github.com/MicrosoftDocs/edge-developer",
+            "url": "https://learn.microsoft.com/en-US/microsoft-edge/",
+            "path": "repos/EdgeDeveloper"
         }
     ],
     "output_folder": "outrepos"
