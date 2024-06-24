@@ -1,3 +1,4 @@
+import os
 from utils.token_counter import TokenCounter
 from utils.aoai_handler import AOAIHandler
 from markdown_handler import MarkdownHandler
@@ -34,17 +35,33 @@ class MarkdownTranslator(MarkdownHandler):
 
         for section in self.markdown.tokenized_content.tokenized_sections:
 
-            print("user_prompt:", user_prompt + section)
+            # print("user_prompt:", user_prompt + section)
 
             messages = [{"role":"system", "content": system_prompt},
                         {"role": "user", "content": user_prompt + section}]
 
             response = aoai_handler.execute(messages)
             
-            print("Translated Section:", response)
+            # print("Translated Section:", response)
             self.markdown.translated_content += response + "\n"
 
         return self.markdown.translated_content
+
+    def save_translation(self):
+
+        if self.markdown.translated_content == "":
+            raise Exception("No translation to save")
+
+        markdown_path = self.markdown_path
+
+        parts = markdown_path.split('\\')
+        parts[0] = "outrepos"
+
+        output_path = os.path.join(*parts)
+
+        with open(output_path, 'w', encoding='utf-8') as file:
+            file.write(self.markdown.translated_content)
+            print("Translation saved to:", output_path)
 
 if __name__ == "__main__":
     markdown_translator = MarkdownTranslator("repos/Edge/edgeenterprise/edge-ie-mode-cloud-site-list-mgmt.md")
