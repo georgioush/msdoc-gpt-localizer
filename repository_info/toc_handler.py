@@ -8,7 +8,7 @@ class TOCHandler:
     def __init__(self, file_path : str):
         self.toc_file_path = file_path
         self.toc = self.load_toc()
-        self.md_files_paths = self.get_md_files_paths()
+        self.md_files_paths = self.get_md_file_names()
 
     def load_toc(self):
         if not os.path.exists(self.toc_file_path):

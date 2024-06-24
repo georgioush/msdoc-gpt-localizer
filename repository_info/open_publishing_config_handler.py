@@ -10,6 +10,7 @@ class OpenPublishingConfigHandler:
         self.config = self.load_openpublishing_config()
         self.build_source_folder = self.get_build_source_folder()
         self.toc_file_path = self.get_toc_file_path()
+        self.breadcrumb_file_path = self.get_breadcrumb_file_path()
 
     def load_openpublishing_config(self):
         config_path = os.path.join(self.repos_base_path, ".openpublishing.publish.config.json")
@@ -23,19 +24,18 @@ class OpenPublishingConfigHandler:
             raise ValueError(f"Error getting build source folder: {e}")
 
     def get_toc_file_path(self):
-        build_source_folder = self.get_build_source_folder()
-        toc_path = os.path.join(self.repos_base_path[0], build_source_folder, "TOC.yml")
+        toc_path = os.path.join(self.repos_base_path, self.build_source_folder, "TOC.yml")
         if not os.path.exists(toc_path):
             raise FileNotFoundError(f"TOC file not found: {toc_path}")
         return toc_path
 
     def get_breadcrumb_file_path(self):
 
-        first_path = os.path.join(self.build_source_folder, "breadcrumb")
+        first_path = os.path.join(self.repos_base_path, self.build_source_folder, "breadcrumb", "toc.yml")
         breadcrumb_path = first_path
 
         if not os.path.exists(first_path):
-            second_path = os.path.join(self.build_source_folder, "crumb")
+            second_path = os.path.join(self.repos_base_path, self.build_source_folder, "crumb", "toc.yml")
             breadcrumb_path = second_path
             if not os.path.exists(second_path):
                 raise FileNotFoundError(f"Breadcrumb file not found: {first_path} or {second_path}")

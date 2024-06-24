@@ -1,136 +1,55 @@
-import re
-import json
-from utils.aoai_handler import AOAIHandler
 from utils.token_counter import TokenCounter
-from msmarkdown import MSMarkdown
+from utils.aoai_handler import AOAIHandler
+from markdown_handler import MarkdownHandler
+from prompts.prompts_handler import PromptHandler
+from translate_tokenizer import TranslateTokenizer
+from repository_info.repository_info_handler import RepositoryInfoHandler
 
-# Utility functions for different header levels
-HEADER_PATTERNS = [
-    (2, r'(?:^|\n)\s*(## .+?)(?=(?:\n\s*## |\Z))'),
-    (3, r'(?:^|\n)\s*(### .+?)(?=(?:\n\s*### |\Z))'),
-    (4, r'(?:^|\n)\s*(#### .+?)(?=(?:\n\s*#### |\Z))'),
-    (5, r'(?:^|\n)\s*(##### .+?)(?=(?:\n\s*##### |\Z))'),
-]
+class MarkdownTranslator(MarkdownHandler):
+    def __init__(self, markdown_path: str):
+        super().__init__(markdown_path)
 
-def split_large_section(section, token_counter, max_tokens):
-    
-    # section は markdown の一部なので、まずは行数を数える
-    lines = section.split('\n')
-    line_count = len(lines)
+    def translate(self):
+        # Initialize the Azure OpenAI handler
+        aoai_handler = AOAIHandler()
+        token_counter = TokenCounter()
+        prompts_handler = PromptHandler(self.repository_info_handler)
 
-    # section のトークン数を max_tokens で割った商を求める なお、端数を切り上げた自然数にする
-    section_num = -(-token_counter.count_tokens(section) // max_tokens)
+        tokenizer = TranslateTokenizer(self.markdown)
+        tokenizer.tokenize()
 
-    # line_count を section_num で割り、分割セクションの行数を決定する 念の為行数を 1 つ減らす
-    split_line_count = line_count // section_num - 1 
+        system_prompt = prompts_handler.system_prompt
+        user_prompt = ""
+        user_prompt += prompts_handler.generate_link_fix_prompt()
+        user_prompt += prompts_handler.user_prompt
 
-    # 最初の行数から split_line_count ずつ取り出して、分割セクションを作成する
-    tokenized_sections = []
-    for i in range(section_num):
-        start = i * split_line_count
-        end = (i + 1) * split_line_count
-        tokenized_sections.append("\n".join(lines[start:end]))
-
-    return tokenized_sections
-
-def tokenize_section(section, token_counter, max_tokens, level=0):
-
-    if token_counter.count_tokens(section) <= max_tokens:
-        return [section]
-
-    if (level + 2) > len(HEADER_PATTERNS) + 1:
-        # If we have reached the maximum header depth, split the section
-        return split_large_section(section, token_counter, max_tokens)
-
-    tokenized_sections = []
-    pattern = HEADER_PATTERNS[level][1]
-    sub_sections = re.split(pattern, section, flags=re.DOTALL)
-
-    for sub_section in sub_sections:
-        if sub_section.strip():
-            print("Header Level:", f"{level + 2}", "Section Size:", f"{token_counter.count_tokens(sub_section)}")
-            tokenized_sections.extend(tokenize_section(sub_section, token_counter, max_tokens, level + 1))
-
-    return tokenized_sections
-
-def tokenize_markdown(markdown: MSMarkdown, max_tokens: int):
-    token_counter = TokenCounter()
-
-    pattern = r'(?:^|\n)\s*(# .+?)(?=(?:\n\s*# |\Z))'
-    sections = re.split(pattern, markdown.content, flags=re.DOTALL)
-    
-    if sections[0].startswith('---'):
-        markdown.tokenized_content.meta_info = sections.pop(0)
-    else:
-        raise ValueError("No meta info found in markdown file.")
-    
-    for section in sections:
-        if section.strip():
-            print("Section Size:", f"{token_counter.count_tokens(section)}")
-
-    for section in sections:
-        if section.strip():
-            markdown.tokenized_content.tokenized_sections.extend(tokenize_section(section, token_counter, max_tokens))
-
-    return markdown
-
-
-def translate(markdown: MSMarkdown):
-    # Initialize the Azure OpenAI handler
-    aoai_handler = AOAIHandler()
-
-    # Load the prompt settings from the translation.json file
-    with open("prompts/translation.json", 'r', encoding='utf-8') as prompt_setting_file:
-        prompt_settings = json.load(prompt_setting_file)
-
-    # Read and store the system and user prompts from their respective files
-    system_prompt_path = prompt_settings["system"]
-    user_prompt_path = prompt_settings["user"]
-
-    with open(system_prompt_path, 'r', encoding='utf-8') as system_prompt_file:
-        system_prompt = system_prompt_file.read()
-    
-    with open(user_prompt_path, 'r', encoding='utf-8') as user_prompt_file:
-        user_prompt_template = user_prompt_file.read()
-
-    # Translate each section of the tokenized content
-    for section in markdown.tokenized_content.tokenized_sections:
-        # Merge user prompt template with the current markdown section
-        user_prompt = user_prompt_template + section
+        print("Meta Info:")
+        print(self.markdown.tokenized_content.meta_info)
         
-        # Create the prompt configuration
-        prompt_config = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ]
+        print("Tokenized Sections:")
+        print("Section Num:", len(self.markdown.tokenized_content.tokenized_sections))
 
-        # Execute the translation with Azure OpenAI
-        response = aoai_handler.execute(prompt_config)
-        
-        # Append the translated section to the markdown's translated content
-        print("Translated Section:", response)
-        markdown.translated_content += response + "\n"
+        for section in self.markdown.tokenized_content.tokenized_sections:
+            print("Tokens:", token_counter.count_tokens(section))
+
+        for section in self.markdown.tokenized_content.tokenized_sections:
+
+            print("user_prompt:", user_prompt + section)
+
+            messages = [{"role":"system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt + section}]
+
+            response = aoai_handler.execute(messages)
+            
+            print("Translated Section:", response)
+            self.markdown.translated_content += response + "\n"
+
+        return self.markdown.translated_content
 
 if __name__ == "__main__":
-    with open("repos/Edge/edgeenterprise/edge-ie-mode-cloud-site-list-mgmt.md", 'r', encoding='utf-8') as file:
-        content = file.read()
-
-    token_counter = TokenCounter()
-    markdown_instance = MSMarkdown(content)
-    tokenize_markdown(markdown_instance, 2048)
-
-    print("Meta Info:")
-    print(markdown_instance.tokenized_content.meta_info)
-    
-    print("Tokenized Sections:")
-    print("Section Num:", len(markdown_instance.tokenized_content.tokenized_sections))
-
-    for section in markdown_instance.tokenized_content.tokenized_sections:
-        print("Tokens:", token_counter.count_tokens(section))
-
-    print("Translation Started")
-    translate(markdown_instance)
+    markdown_translator = MarkdownTranslator("repos/Edge/edgeenterprise/edge-ie-mode-cloud-site-list-mgmt.md")
+    markdown_translator.translate()
 
     with open("outrepos/Edge/edgeenterprise/edge-ie-mode-cloud-site-list-mgmt.md", 'w', encoding='utf-8') as file:
-        file.write(markdown_instance.translated_content)
+        file.write(markdown_translator.markdown.translated_content)
         print("Translation Finished")
