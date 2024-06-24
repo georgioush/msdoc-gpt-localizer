@@ -1,12 +1,14 @@
 import os
 import json
 import subprocess
+import shutil
 
 class RepositoryManager:
     def __init__(self, config_path="repository_config.json"):
         self.config_path = config_path
         self.config_data = self.load_config()
         self.repo_paths = self.get_repo_paths()
+        self.output_folder = self.config_data.get("output_folder")
 
     def load_config(self):
         if os.path.exists(self.config_path):
@@ -26,10 +28,9 @@ class RepositoryManager:
                 if not os.path.exists(repo_folder_name):
                     os.makedirs(repo_folder_name)
                     self.run_clone_command(repo_url, repo_folder_name)
+                    self.copy_to_outrepos(repo_name, repo_folder_name)  # Copy to output_folder after successful clone
                 else:
                     print(f"Folder '{repo_folder_name}' already exists. Skipping clone for repository '{repo_name}'.")
-                
-                self.repo_paths.append(repo_folder_name)  # Append the repo folder path to repo_paths
 
     def run_clone_command(self, repo_url, output_folder):
         try:
@@ -37,6 +38,13 @@ class RepositoryManager:
             print(f"Cloned {repo_url} into {output_folder}")
         except subprocess.CalledProcessError as e:
             print(f"Failed to clone {repo_url}: {e}")
+
+    def copy_to_outrepos(self, repo_name, repo_folder_name):
+        outrepos_path = os.path.join(self.output_folder, repo_name)
+        if os.path.exists(outrepos_path):
+            shutil.rmtree(outrepos_path)
+        shutil.copytree(repo_folder_name, outrepos_path)
+        print(f"Copied {repo_folder_name} to {outrepos_path}")
 
     def get_repo_paths(self):
         repos = self.config_data.get("repos", [])

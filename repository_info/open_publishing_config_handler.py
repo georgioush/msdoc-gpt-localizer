@@ -30,13 +30,14 @@ class OpenPublishingConfigHandler:
         return toc_path
 
     def get_breadcrumb_file_path(self):
+        paths_to_try = [
+            os.path.join(self.repos_base_path, self.build_source_folder, "breadcrumb", "toc.yml"),
+            os.path.join(self.repos_base_path, self.build_source_folder, "crumb", "toc.yml"),
+            os.path.join(self.repos_base_path, self.build_source_folder, "breadcrumbs", "toc.yml")
+        ]
 
-        first_path = os.path.join(self.repos_base_path, self.build_source_folder, "breadcrumb", "toc.yml")
-        breadcrumb_path = first_path
+        for path in paths_to_try:
+            if os.path.exists(path):
+                return path
 
-        if not os.path.exists(first_path):
-            second_path = os.path.join(self.repos_base_path, self.build_source_folder, "crumb", "toc.yml")
-            breadcrumb_path = second_path
-            if not os.path.exists(second_path):
-                raise FileNotFoundError(f"Breadcrumb file not found: {first_path} or {second_path}")
-        return breadcrumb_path
+        raise FileNotFoundError(f"Breadcrumb file not found in any of the following paths: {paths_to_try}")
