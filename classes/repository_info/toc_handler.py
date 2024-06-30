@@ -1,14 +1,12 @@
 import os
 import yaml
 
-# 与えられた TOC ファイルから情報を取得するために使用されるべきクラス。
-# 例えば、別のファイルの情報を参照しないと取得できないようなものは利用するべきではない
-
-class TOCHandler:
-    def __init__(self, file_path : str):
+class TocHandler:
+    def __init__(self, file_path: str):
         self.file_path = file_path
         self.toc = self.load_toc()
-        self.md_files_paths = self.get_md_file_names()
+        self.md_files = self.get_md_file_names()
+        self.existing_md_files = self.check_files_exist(self.md_files)
 
     def load_toc(self):
         if not os.path.exists(self.file_path):
@@ -17,44 +15,57 @@ class TOCHandler:
         with open(self.file_path, 'r', encoding='utf-8') as file:
             return yaml.safe_load(file)
 
-    def get_name_href_pairs(self):
-        return self.extract_name_href_pairs(self.toc)
-
-    def extract_name_href_pairs(self, content: yaml):
-        pairs = []
-        if isinstance(content, list):
-            for item in content:
-                pairs.extend(self.extract_name_href_pairs(item))
-        elif isinstance(content, dict):
-            name = content.get('name', None)
-            href = content.get('href', None)
-            if name and href:
-                pairs.append({'name': name, 'href': href})
-
-            items = content.get('items', [])
-            pairs.extend(self.extract_name_href_pairs(items))
-        return pairs
-
-    def extract_hrefs(self, content: yaml):
-        hrefs = []
-        if isinstance(content, list):
-            for item in content:
-                hrefs.extend(self.extract_hrefs(item))
-        elif isinstance(content, dict):
-            href = content.get('href', None)
-            if href:
-                hrefs.append(href)
-
-            items = content.get('items', [])
-            hrefs.extend(self.extract_hrefs(items))
-        return hrefs
-
     def get_md_file_names(self):
-        md_file_paths = []
-        hrefs = self.extract_hrefs(self.toc)
+        # yaml ファイルを再帰的に探索し、md ファイルのパスを取得する
+        md_file_names = []
 
-        for href in hrefs:
-            if href.endswith('.md'):
-                md_file_paths.append(href)
-        return md_file_paths
+        all_hrefs = self.extract_and_find_href(self.toc)
 
+        for href in all_hrefs:
+            if href.endswith(".md"):
+                md_file_names.append(href)
+            else:
+                split_href = href.split("?")
+                if split_href[0].endswith(".md"):
+                    md_file_names.append(split_href[0])
+        
+        return md_file_names
+
+    # node の一番下にしか href がない
+    def extract_and_find_href(self, node):
+        href_files = []
+
+        # node の最下層に href があるので、そこまで再帰的に探索していく
+        if isinstance(node, list):
+            for item in node:
+                href_files.extend(self.extract_and_find_href(item))
+        elif isinstance(node, dict):
+            if "href" in node:
+                href_files.append(str(node["href"]))
+            else:
+                for key, value in node.items():
+                    href_files.extend(self.extract_and_find_href(value))
+
+        return href_files
+
+    def check_files_exist(self, md_files: list) -> list:
+
+        existing_md_files = []
+        folder_path = os.path.dirname(self.file_path)
+
+        for file_name in md_files:
+            full_path = os.path.join(folder_path, file_name)
+            if not os.path.exists(full_path):
+                print(f"File not found: {full_path}")
+            else:
+                existing_md_files.append(file_name)
+        return existing_md_files
+
+# Example usage
+if __name__ == "__main__":
+    toc_file_path = "../../repos/DevOps/docs/toc.yml"
+    toc_handler = TocHandler(toc_file_path)
+
+    folder_path = os.path.dirname(toc_handler.file_path)
+    print(f"Folder path: {folder_path}")
+    # print(f"existing_md_files: {toc_handler.existing_md_files}")

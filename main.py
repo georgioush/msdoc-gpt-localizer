@@ -13,11 +13,11 @@ def main():
     # docset は複数の可能性がある (DevOps などはそう)
     docset_handler = repository_info_handler.docsets_handlers[0]
 
-    mds_names = docset_handler.toc_handler.get_md_file_names()
+    mds_files = docset_handler.toc_handler.existing_md_files
 
     folder_path = docset_handler.file_path
 
-    mds_paths = [os.path.join(folder_path, md) for md in mds_names]
+    mds_paths = [os.path.join(folder_path, md) for md in mds_files]
 
     print(mds_paths)
 
