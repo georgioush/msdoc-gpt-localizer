@@ -2,16 +2,21 @@
     "repos": [
         {
             "name": "Edge",
-            "repo_url": "https://github.com/MicrosoftDocs/Edge-Enterprise",
-            "url": "https://learn.microsoft.com/en-us/deployedge/",
-            "path": "repos/Edge"
+            "repo_url": "https://github.com/MicrosoftDocs/Edge-Enterprise"
         },
         {
             "name": "EdgeDeveloper",
-            "repo_url": "https://github.com/MicrosoftDocs/edge-developer",
-            "url": "https://learn.microsoft.com/en-US/microsoft-edge/",
-            "path": "repos/EdgeDeveloper"
+            "repo_url": "https://github.com/MicrosoftDocs/edge-developer"
+        },
+        {
+            "name": "DevOps",
+            "repo_url": "https://github.com/MicrosoftDocs/azure-devops-docs"
+        },
+        {
+            "name": "PowerBI",
+            "repo_url": "https://github.com/MicrosoftDocs/powerbi-docs/"
         }
     ],
+    "clone_folder": "repos",
     "output_folder": "outrepos"
 }

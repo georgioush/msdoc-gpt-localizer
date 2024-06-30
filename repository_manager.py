@@ -19,36 +19,43 @@ class RepositoryManager:
 
     def clone_repositories(self):
         for repo in self.config_data.get("repos", []):
+            base = self.config_data.get("clone_folder")
             repo_name = repo.get("name")
+
+            clone_destination = os.path.join(base, repo_name)
             repo_url = repo.get("repo_url")
-            repo_path = repo.get("path")
-            repo_folder_name = os.path.join(repo_path)  # Use the path from the configuration
 
             if repo_url:
-                if not os.path.exists(repo_folder_name):
-                    os.makedirs(repo_folder_name)
-                    self.run_clone_command(repo_url, repo_folder_name)
-                    self.copy_to_outrepos(repo_name, repo_folder_name)  # Copy to output_folder after successful clone
+                if not os.path.exists(clone_destination):
+                    os.makedirs(clone_destination)
+                    self.run_clone_command(repo_url, clone_destination)
+                    self.copy_to_outrepos(repo_name, clone_destination)  # Copy to output_folder after successful clone
                 else:
-                    print(f"Folder '{repo_folder_name}' already exists. Skipping clone for repository '{repo_name}'.")
+                    print(f"Folder '{clone_destination}' already exists. Skipping clone for repository '{repo_name}'.")
 
-    def run_clone_command(self, repo_url, output_folder):
+    def run_clone_command(self, repo_url, clone_destination):
         try:
-            subprocess.run(["git", "clone", repo_url, output_folder], check=True)
-            print(f"Cloned {repo_url} into {output_folder}")
+            subprocess.run(["git", "clone", repo_url, clone_destination], check=True)
+            print(f"Cloned {repo_url} into {clone_destination}")
         except subprocess.CalledProcessError as e:
             print(f"Failed to clone {repo_url}: {e}")
 
-    def copy_to_outrepos(self, repo_name, repo_folder_name):
+    def copy_to_outrepos(self, repo_name, clone_destination):
+
         outrepos_path = os.path.join(self.output_folder, repo_name)
         if os.path.exists(outrepos_path):
             shutil.rmtree(outrepos_path)
-        shutil.copytree(repo_folder_name, outrepos_path)
-        print(f"Copied {repo_folder_name} to {outrepos_path}")
+        shutil.copytree(clone_destination, outrepos_path)
+        print(f"Copied {clone_destination} to {outrepos_path}")
 
     def get_repo_paths(self):
+        
+        base = self.config_data.get("clone_folder")
+
         repos = self.config_data.get("repos", [])
-        paths = [repo["path"] for repo in repos]
+        names = [repo["name"] for repo in repos]
+        paths = [os.path.join(base, name) for name in names]
+
         return paths
 
 if __name__ == "__main__":
