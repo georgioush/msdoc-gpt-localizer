@@ -1,10 +1,9 @@
 import os
 from utils.token_counter import TokenCounter
 from utils.aoai_handler import AOAIHandler
-from markdown_handler import MarkdownHandler
 from prompts.prompts_handler import PromptHandler
-from translate_tokenizer import TranslateTokenizer
-from repository_info.repository_info_handler import RepositoryInfoHandler
+from classes.msmarkdown.markdown_handler import MarkdownHandler
+from classes.msmarkdown.translate_tokenizer import TranslateTokenizer
 
 class MarkdownTranslator(MarkdownHandler):
     def __init__(self, markdown_path: str):

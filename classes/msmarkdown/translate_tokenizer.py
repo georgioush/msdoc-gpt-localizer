@@ -1,6 +1,6 @@
 import re
-from markdown_tokenizer import MarkdownTokenizer
-from msmarkdown import MSMarkdown
+from classes.msmarkdown.markdown_tokenizer import MarkdownTokenizer
+from classes.msmarkdown.msmarkdown import MSMarkdown
 from utils.token_counter import TokenCounter
 
 # Utility functions for different header levels

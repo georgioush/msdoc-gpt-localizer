@@ -1,5 +1,5 @@
-from markdown_tokenizer import MarkdownTokenizer
-from msmarkdown import MSMarkdown
+from classes.msmarkdown.markdown_tokenizer import MarkdownTokenizer
+from classes.msmarkdown.msmarkdown import MSMarkdown
 
 class SummarizeTokenizer(MarkdownTokenizer):
     def tokenize(self, markdown: MSMarkdown):

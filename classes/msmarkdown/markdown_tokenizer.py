@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from msmarkdown import MSMarkdown
+from classes.msmarkdown.msmarkdown import MSMarkdown
 
 class MarkdownTokenizer(ABC):
     def __init__(self, markdown: MSMarkdown):

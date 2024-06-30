@@ -1,5 +1,5 @@
-from open_publishing_config_handler import OpenPublishingConfigHandler
-from docsets_handler import DocsetsHandler
+from classes.repository_info.open_publishing_config_handler import OpenPublishingConfigHandler
+from classes.repository_info.docsets_handler import DocsetsHandler
 
 # InfoHandler は repository_manager によってクローンされてきた各フォルダの情報を処理するクラスです。
 # レポジトリに対して 1v1 で対応する。

@@ -1,16 +1,16 @@
 {
     "repos": [
         {
+            "name": "DevOps",
+            "repo_url": "https://github.com/MicrosoftDocs/azure-devops-docs"
+        },
+        {
             "name": "Edge",
             "repo_url": "https://github.com/MicrosoftDocs/Edge-Enterprise"
         },
         {
             "name": "EdgeDeveloper",
             "repo_url": "https://github.com/MicrosoftDocs/edge-developer"
-        },
-        {
-            "name": "DevOps",
-            "repo_url": "https://github.com/MicrosoftDocs/azure-devops-docs"
         },
         {
             "name": "PowerBI",

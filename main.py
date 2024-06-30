@@ -1,20 +1,23 @@
 import os
 from repository_manager import RepositoryManager
 from classes.repository_info.repository_info_handler import RepositoryInfoHandler
-from classes.markdown.markdown_translator import MarkdownTranslator
+from classes.msmarkdown.markdown_translator import MarkdownTranslator
 
 def main():
     manager = RepositoryManager()
     manager.clone_repositories()
 
     repo_paths = manager.get_repo_paths()
-    repository_info_handler = RepositoryInfoHandler(repo_paths[1])
+    repository_info_handler = RepositoryInfoHandler(repo_paths[0])
 
-    mds = repository_info_handler.toc_handler.get_md_file_names()
-    source_folder = repository_info_handler.config_handler.repos_base_path
-    build_source_folder = repository_info_handler.config_handler.build_source_folder
+    # docset は複数の可能性がある (DevOps などはそう)
+    docset_handler = repository_info_handler.docsets_handlers[0]
 
-    mds_paths = [os.path.join(source_folder, build_source_folder, md) for md in mds]
+    mds = docset_handler.toc_handler.get_md_file_names()
+
+    folder_path = docset_handler.file_path
+
+    mds_paths = [os.path.join(folder_path, md) for md in mds]
 
     print(mds_paths)
 

@@ -1,7 +1,6 @@
 import os
-from abc import ABC, abstractmethod
-from msmarkdown import MSMarkdown
-from repository_info.repository_info_handler import RepositoryInfoHandler
+from classes.msmarkdown.msmarkdown import MSMarkdown
+from classes.repository_info.repository_info_handler import RepositoryInfoHandler
 
 
 class MarkdownHandler:

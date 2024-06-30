@@ -1,5 +1,5 @@
 import json
-from repository_info.repository_info_handler import RepositoryInfoHandler
+from classes.repository_info.repository_info_handler import RepositoryInfoHandler
 
 class PromptHandler:
     def __init__(self, repository_handler: RepositoryInfoHandler = None):

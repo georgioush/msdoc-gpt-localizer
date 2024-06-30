@@ -1,7 +1,7 @@
 import os
 from utils.aoai_handler import AOAIHandler
 from utils.token_counter import TokenCounter
-from msmarkdown import MSMarkdown
+from classes.msmarkdown.msmarkdown import MSMarkdown
 
 def msdoc_tokenizer(markdowm: MSMarkdown):
     pass

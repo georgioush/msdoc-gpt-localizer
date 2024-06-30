@@ -1,7 +1,7 @@
 import os
-from docfx_handler import DocfxHandler
-from toc_handler import TOCHandler
-from breadcrumb_handler import BreadcrumbHandler
+from classes.repository_info.docfx_handler import DocfxHandler
+from classes.repository_info.toc_handler import TOCHandler
+from classes.repository_info.breadcrumb_handler import BreadcrumbHandler
 
 class DocsetsHandler:
     def __init__(self, file_path):
