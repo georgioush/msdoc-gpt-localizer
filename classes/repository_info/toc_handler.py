@@ -52,7 +52,6 @@ class TOCHandler:
     def get_md_file_names(self):
         md_file_paths = []
         hrefs = self.extract_hrefs(self.toc)
-        
 
         for href in hrefs:
             if href.endswith('.md'):
