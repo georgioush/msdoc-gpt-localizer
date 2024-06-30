@@ -1,7 +1,7 @@
 import os
 from repository_manager import RepositoryManager
-from repository_info.repository_info_handler import RepositoryInfoHandler
-from markdown_translator import MarkdownTranslator
+from classes.repository_info.repository_info_handler import RepositoryInfoHandler
+from classes.markdown.markdown_translator import MarkdownTranslator
 
 def main():
     manager = RepositoryManager()
