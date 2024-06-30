@@ -6,15 +6,15 @@ import yaml
 
 class TOCHandler:
     def __init__(self, file_path : str):
-        self.toc_file_path = file_path
+        self.file_path = file_path
         self.toc = self.load_toc()
         self.md_files_paths = self.get_md_file_names()
 
     def load_toc(self):
-        if not os.path.exists(self.toc_file_path):
-            raise FileNotFoundError(f"TOC file not found: {self.toc_file_path}")
+        if not os.path.exists(self.file_path):
+            raise FileNotFoundError(f"TOC file not found: {self.file_path}")
         
-        with open(self.toc_file_path, 'r', encoding='utf-8') as file:
+        with open(self.file_path, 'r', encoding='utf-8') as file:
             return yaml.safe_load(file)
 
     def get_name_href_pairs(self):

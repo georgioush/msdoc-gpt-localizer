@@ -8,7 +8,7 @@ def main():
     manager.clone_repositories()
 
     repo_paths = manager.get_repo_paths()
-    repository_info_handler = RepositoryInfoHandler(repo_paths[0])
+    repository_info_handler = RepositoryInfoHandler(repo_paths[1])
 
     mds = repository_info_handler.toc_handler.get_md_file_names()
     source_folder = repository_info_handler.config_handler.repos_base_path
