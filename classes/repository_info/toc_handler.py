@@ -1,7 +1,7 @@
 import os
 import yaml
 
-class TocHandler:
+class TOCHandler:
     def __init__(self, file_path: str):
         self.file_path = file_path
         self.toc = self.load_toc()
@@ -64,7 +64,7 @@ class TocHandler:
 # Example usage
 if __name__ == "__main__":
     toc_file_path = "../../repos/DevOps/docs/toc.yml"
-    toc_handler = TocHandler(toc_file_path)
+    toc_handler = TOCHandler(toc_file_path)
 
     folder_path = os.path.dirname(toc_handler.file_path)
     print(f"Folder path: {folder_path}")

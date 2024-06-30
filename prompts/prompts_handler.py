@@ -42,7 +42,7 @@ class PromptHandler:
         except FileNotFoundError:
             raise Exception("Failed to open translation_user.md. Please make sure the file exists.")
         
-        link_fix_prompt += self.repository_info_handler.breadcrumb_handler.get_weblink_path()
+        link_fix_prompt += self.repository_info_handler.docsets_handlers[0].breadcrumb_handler.get_weblink_path()
         link_fix_prompt += "\n\n"
 
         return link_fix_prompt
