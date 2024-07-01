@@ -27,4 +27,4 @@ class AOAIHandler:
         if response.choices[0].message.content is not None:
             return response.choices[0].message.content + "\n"
         else:
-            raise ValueError("No response content received")
+            pass

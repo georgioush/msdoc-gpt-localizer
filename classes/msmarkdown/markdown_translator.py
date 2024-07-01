@@ -40,9 +40,9 @@ class MarkdownTranslator(MarkdownHandler):
                         {"role": "user", "content": user_prompt + section}]
 
             response = aoai_handler.execute(messages)
-            
             # print("Translated Section:", response)
-            self.markdown.translated_content += response + "\n"
+            if response is not None:
+                self.markdown.translated_content += response + "\n"
 
         return self.markdown.translated_content
 

@@ -16,9 +16,9 @@ class TOCHandler:
             return yaml.safe_load(file)
 
     def get_md_file_names(self):
-        # yaml ファイルを再帰的に探索し、md ファイルのパスを取得する
         md_file_names = []
 
+        # extract_and_find_href 関数を使ってすべての href を取得する
         all_hrefs = self.extract_and_find_href(self.toc)
 
         for href in all_hrefs:
@@ -31,25 +31,25 @@ class TOCHandler:
         
         return md_file_names
 
-    # node の一番下にしか href がない
     def extract_and_find_href(self, node):
         href_files = []
 
-        # node の最下層に href があるので、そこまで再帰的に探索していく
-        if isinstance(node, list):
-            for item in node:
-                href_files.extend(self.extract_and_find_href(item))
-        elif isinstance(node, dict):
-            if "href" in node:
-                href_files.append(str(node["href"]))
-            else:
-                for key, value in node.items():
-                    href_files.extend(self.extract_and_find_href(value))
+        # 再帰的にすべての href を取得する
+        def find_hrefs(n):
+            if isinstance(n, dict):
+                for key, value in n.items():
+                    if key == "href":
+                        href_files.append(str(value))
+                    else:
+                        find_hrefs(value)
+            elif isinstance(n, list):
+                for item in n:
+                    find_hrefs(item)
 
+        find_hrefs(node)
         return href_files
 
     def check_files_exist(self, md_files: list) -> list:
-
         existing_md_files = []
         folder_path = os.path.dirname(self.file_path)
 
@@ -59,6 +59,8 @@ class TOCHandler:
                 print(f"File not found: {full_path}")
             else:
                 existing_md_files.append(file_name)
+        
+        print(f"existing_md_files nums: {len(existing_md_files)}")
         return existing_md_files
 
 # Example usage
@@ -68,4 +70,4 @@ if __name__ == "__main__":
 
     folder_path = os.path.dirname(toc_handler.file_path)
     print(f"Folder path: {folder_path}")
-    # print(f"existing_md_files: {toc_handler.existing_md_files}")
+    print(f"existing_md_files nums: {len(toc_handler.existing_md_files)}")

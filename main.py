@@ -8,7 +8,7 @@ def main():
     manager.clone_repositories()
 
     repo_paths = manager.get_repo_paths()
-    repository_info_handler = RepositoryInfoHandler(repo_paths[0])
+    repository_info_handler = RepositoryInfoHandler(repo_paths[2])
 
     # docset は複数の可能性がある (DevOps などはそう)
     for docset_handler in repository_info_handler.docsets_handlers:
